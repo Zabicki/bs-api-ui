@@ -1,4 +1,4 @@
-# my-vue-app
+# bs-api-ui
 
 ## Project setup
 ```
