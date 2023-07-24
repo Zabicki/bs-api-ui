@@ -1,25 +1,57 @@
 <template>
-  <div>
-    <button class="action-button" @click="countEvents">Count Events</button>
-    <button class="action-button" @click="startInvoicing">Start Invoicing</button>
-    <button class="action-button" @click="startSynchronization">Start Synchronization</button>
+  <div class="container">
+    <div class="action-container">
+      <button class="action-button" @click="countEvents">Count Events</button>
+      <div v-if="eventsCount !== null" class="response">
+        Received events count: {{ eventsCount }}
+      </div>
+    </div>
 
-    <div class="events-count" v-if="eventsCount !== null">
-      <h3>Events count: {{ eventsCount }}</h3>
+    <div class="action-container">
+      <button class="action-button" @click="startInvoicing">Start Invoicing</button>
+      <div v-if="invoicingTime !== null" class="response">
+        Invoicing process time: {{ invoicingTime }} seconds
+      </div>
+    </div>
+
+    <div class="action-container">
+      <button class="action-button" @click="startSynchronization">Start Synchronization</button>
+      <div v-if="synchronizationTime !== null" class="response">
+        Synchronization process time: {{ synchronizationTime }} seconds
+      </div>
     </div>
   </div>
 </template>
 
+
 <style>
-  .action-button {
-    display: inline-block; /* Display buttons side by side */
-    height: 50px;          /* Set the height of the button */
-    line-height: 50px;     /* Align text vertically in the center */
-    padding: 0 20px;       /* Add some horizontal padding to each button */
-    margin-right: 10px;    /* Add some spacing to the right of each button */
-    border-radius: 5px;    /* Optional: add a border radius for aesthetics */
-    /* Other button styles can be added here */
-  }
+/* ... existing styles ... */
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.action-container {
+  display: flex;
+  align-items: center;  /* Vertically align items in the center */
+  margin-bottom: 10px; /* Space between each button-response pair */
+}
+
+.action-button {
+  margin-right: 20px;
+  height: 50px;         /* Set a fixed height */
+  width: 200px;         /* Set a fixed width */
+  line-height: 50px;    /* Align text vertically in the center */
+  text-align: center;   /* Center the button text horizontally */
+  /* ... other existing styles ... */
+}
+
+.response {
+  flex-grow: 1; /* Allow the response to take up the remaining horizontal space */
+}
+
+/* ... other styles ... */
 </style>
 
 <script>
@@ -32,7 +64,9 @@ export default {
   },
   data() {
     return {
-      eventsCount: null
+      eventsCount: null,
+      invoicingTime: null,
+      synchronizationTime: null
     };
   },
   methods: {
@@ -47,14 +81,19 @@ export default {
     },
     async startInvoicing() {
       try {
-        await fetch(`${this.apiBase}/invoicing`, { method: "GET" });
+        const response = await fetch(`${this.apiBase}/invoicing`, { method: "GET" });
+        const data = await response.json();
+        this.invoicingTime = data.processingTime;
       } catch (error) {
         console.error("Error starting invoicing:", error);
       }
     },
+
     async startSynchronization() {
       try {
-        await fetch(`${this.apiBase}/synchronization`, { method: "GET" });
+        const response = await fetch(`${this.apiBase}/synchronization`, { method: "GET" });
+        const data = await response.json();
+        this.synchronizationTime = data.processingTime;
       } catch (error) {
         console.error("Error starting synchronization:", error);
       }
